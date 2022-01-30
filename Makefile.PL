@@ -9,20 +9,40 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/acronym.pm',
     ABSTRACT_FROM    => 'lib/acronym.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.006',
+    META_MERGE       => {
+        'meta-spec'    => {version => 2},
+        dynamic_config => 0,
+        prereqs   => {
+            runtime => {requires => {perl => '5.008'}}
+        },
+        resources => {
+            bugtracker => {
+                web => 'https://github.com/augensalat/perl-acronym/issues'
+            },
+            license    => [
+                'http://www.opensource.org/licenses/artistic-license-2.0',
+            ],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/augensalat/perl-acronym.git',
+                web  => 'https://github.com/augensalat/perl-acronym',
+            },
+        },
+    },
+    MIN_PERL_VERSION => '5.008',
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' => '6.64',
     },
     TEST_REQUIRES => {
         'Test::Fatal' => '0',
-        'Test::More'  => '0',
+        'Test::More'  => '0.90',
     },
     PREREQ_PM => {
         'Carp'      => '0',
         'Sub::Util' => '1.40',
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'acronym-*' },
+    dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
+    clean => {FILES => 'acronym-*'},
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

@@ -1,0 +1,205 @@
+name: CI
+
+on:
+  - push
+
+jobs:
+
+  # System Perl on Ubuntu-latest
+  # must pass before diving into the Matrix
+
+  prelude:
+
+    name: Linux System Perl (Ubuntu)
+    runs-on: ubuntu-latest
+
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 1
+      RELEASE_TESTING: 1
+      HARNESS_OPTIONS: j4
+
+    steps:
+
+      - name: Switch to branch
+        uses: actions/checkout@v2
+
+      - name: Perl version
+        run: perl -V
+
+      - name: Install dependencies
+        uses: perl-actions/install-with-cpm@stable
+        with:
+          install: |
+            ExtUtils::MakeMaker
+            Sub::Util
+            Test::Fatal
+            Test::More
+
+      - name: Run tests
+        run: |
+          perl Makefile.PL
+          make
+          make test
+
+  # Linux major Perl versions
+
+  linux:
+
+    name: Linux Perl v${{ matrix.perl-version }}
+    needs: prelude
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.8'
+          - '5.10'
+          - '5.12'
+          - '5.14'
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
+          - '5.32'
+          - '5.34'
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+
+      - name: Switch to branch
+        uses: actions/checkout@v2
+
+      - name: Perl version
+        run: perl -V
+
+      - name: Install dependencies
+        run: cpm install --show-build-log-on-failure ExtUtils::MakeMaker Sub::Util Test::Fatal Test::More
+
+      - name: Run tests
+        run: |
+          perl Makefile.PL
+          make
+          make test
+        env:
+          AUTHOR_TESTING: 1
+          RELEASE_TESTING: 1
+          HARNESS_OPTIONS: j4
+
+  # macOS major Perl versions
+
+  macos:
+
+    name: macOS Perl v${{ matrix.perl-version }}
+    needs: prelude
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+        perl-version:
+          - '5.8'
+          - '5.10'
+          - '5.12'
+          - '5.14'
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
+          - '5.32'
+          - '5.34'
+
+    steps:
+
+      - name: Switch to branch
+        uses: actions/checkout@v2
+
+      - name: Set Up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+
+      - name: Perl version
+        run: perl -V
+
+      - name: Install dependencies
+        run: cpm install --show-build-log-on-failure ExtUtils::MakeMaker Sub::Util Test::Fatal Test::More
+
+      - name: Run tests
+        run: |
+          perl Makefile.PL
+          make
+          make test
+        env:
+          AUTHOR_TESTING: 1
+          RELEASE_TESTING: 1
+          HARNESS_OPTIONS: j4
+
+  # Windows major Perl versions
+
+  windows:
+
+    name: Windows Perl v${{ matrix.perl-version }}
+    needs: prelude
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+        perl-version:
+          - '5.8'
+          # 2022-01-30 fails, see https://github.com/shogo82148/actions-setup-perl/issues/876#issuecomment-1025459924
+          # - '5.10'
+          # - '5.12'
+          - '5.14'
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.24'
+          - '5.26'
+          - '5.28'
+          - '5.30'
+          - '5.32'
+          - '5.34'
+
+    steps:
+
+      - name: Switch to branch
+        uses: actions/checkout@v2
+
+      - name: Set Up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+
+      - name: Perl version
+        run: perl -V
+
+      - name: Install dependencies
+        run: cpm install --show-build-log-on-failure ExtUtils::MakeMaker Sub::Util Test::Fatal Test::More
+
+      - name: Run tests
+        run: |
+          perl Makefile.PL
+          make
+          make test
+        env:
+          AUTHOR_TESTING: 1
+          RELEASE_TESTING: 1
+          HARNESS_OPTIONS: j4
