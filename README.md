@@ -1,5 +1,7 @@
 # acronym
 
+[![Build Status](https://github.com/augensalat/perl-acronym/actions/workflows/ci.yml/badge.svg)](https://github.com/augensalat/perl-acronym/actions/workflows/ci.yml)
+
 If you hate writing code like
 
     die BigCompany::MyDepartment::ProjectX::WebService::Error::HTTP::NotFound->new(
